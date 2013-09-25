@@ -12,9 +12,9 @@ clobber: clean
 	rm -rf gz
 
 shp/tl_2013_us_county_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_county.shp
-	ogr2ogr -clipsrc shp/ne_10m_admin_0_countries_lakes.shp $@ shp/tl_2013_us_county.shp
+	ogr2ogr -progress -clipsrc shp/ne_10m_admin_0_countries_lakes.shp $@ shp/tl_2013_us_county.shp
 shp/tl_2013_us_cbsa_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_cbsa.shp
-	ogr2ogr -clipsrc shp/ne_10m_admin_0_countries_lakes.shp $@ shp/tl_2013_us_cbsa.shp
+	ogr2ogr -progress -clipsrc shp/ne_10m_admin_0_countries_lakes.shp $@ shp/tl_2013_us_cbsa.shp
 
 shp/%.shp: zip/%.zip
 	mkdir -p $(dir $@)
