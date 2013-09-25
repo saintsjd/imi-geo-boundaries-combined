@@ -1,6 +1,6 @@
 
 #all: zip/tl_2013_us_county.zip zip/tl_2013_us_cbsa.zip zip/region-shp.zip zip/ne_10m_admin_1_states_provinces_lakes_shp.zip zip/ne_10m_admin_0_countries_lakes.zip zip/ne_50m_admin_1_states_provinces_lakes_shp.zip zip/ne_50m_admin_0_countries_lakes.zip
-all: shp/tl_2013_us_county_clipped.shp shp/tl_2013_us_cbsa_clipped.shp shp/tl_2013_us_county.shp shp/tl_2013_us_cbsa.shp shp/region-shp.shp shp/ne_10m_admin_1_states_provinces_lakes_shp.shp shp/ne_10m_admin_0_countries_lakes.shp shp/ne_50m_admin_1_states_provinces_lakes_shp.shp shp/ne_50m_admin_0_countries_lakes.shp
+all: tmp/tl_2013_us_county_clipped.shp tmp/tl_2013_us_cbsa_clipped.shp shp/tl_2013_us_county.shp shp/tl_2013_us_cbsa.shp shp/region-shp.shp shp/ne_10m_admin_1_states_provinces_lakes_shp.shp shp/ne_10m_admin_0_countries_lakes.shp shp/ne_50m_admin_1_states_provinces_lakes_shp.shp shp/ne_50m_admin_0_countries_lakes.shp
 
 clean:
 	rm -rf shp
@@ -11,10 +11,31 @@ clobber: clean
 	rm -rf zip
 	rm -rf gz
 
-shp/tl_2013_us_county_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_county.shp
+tmp/imi_overview_map.shp: tmp/counties_us.shp tmp/states_ca_mx.shp
+	mkdir -p $(dir $@)
+	ogr2ogr $@ $<
+	ogr2ogr -update -append $@ tmp/states_ca_mx.shp -nln imi_overview_map
+	touch $@
+
+tmp/counties_us.shp: tmp/tl_2013_us_county_clipped.shp tmp/states_us.shp
+	ogr2ogr -sql "select CONCAT(s.country,'.',s.state_abbr,'.',c.countyfp) as id, s.country as country,s.region as region,s.state as state,s.state_abbr as state_abbr, s.statefp as statefp, c.NAME as county, c.COUNTYFP as countyfp FROM tl_2013_us_county_clipped c LEFT JOIN 'tmp/states_us.dbf'.states_us s ON c.STATEFP=s.statefp" $@ $<
+	touch $@
+
+tmp/states_ca_mx.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
+	ogr2ogr -sql "select code_hasc as id, iso_a2 as country,region_big as region,name as state,postal as state_abbr, SUBSTR(code_local,3,2) as statefp FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('CA', 'MX')" $@ $<
+	touch $@
+tmp/states_us.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
+	ogr2ogr -sql "select iso_a2 as country,region_big as region,name as state,postal as state_abbr, SUBSTR(code_local,3,2) as statefp,code_hasc as id FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('US')" $@ $<
+	touch $@
+
+tmp/tl_2013_us_county_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_county.shp
+	mkdir -p $(dir $@)
 	ogr2ogr -progress -clipsrc shp/ne_10m_admin_0_countries_lakes.shp -clipsrcwhere "adm0_a3='USA'" $@ shp/tl_2013_us_county.shp
-shp/tl_2013_us_cbsa_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_cbsa.shp
+	touch $@
+tmp/tl_2013_us_cbsa_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_cbsa.shp
+	mkdir -p $(dir $@)
 	ogr2ogr -progress -clipsrc shp/ne_10m_admin_0_countries_lakes.shp -clipsrcwhere "adm0_a3='USA'" $@ shp/tl_2013_us_cbsa.shp
+	touch $@
 
 shp/%.shp: zip/%.zip
 	mkdir -p $(dir $@)
