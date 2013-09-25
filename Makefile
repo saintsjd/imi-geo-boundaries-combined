@@ -1,6 +1,6 @@
 
 #all: zip/tl_2013_us_county.zip zip/tl_2013_us_cbsa.zip zip/region-shp.zip zip/ne_10m_admin_1_states_provinces_lakes_shp.zip zip/ne_10m_admin_0_countries_lakes.zip zip/ne_50m_admin_1_states_provinces_lakes_shp.zip zip/ne_50m_admin_0_countries_lakes.zip
-all: shp/tl_2013_us_county.shp shp/tl_2013_us_cbsa.shp shp/region-shp.shp shp/ne_10m_admin_1_states_provinces_lakes_shp.shp shp/ne_10m_admin_0_countries_lakes.shp shp/ne_50m_admin_1_states_provinces_lakes_shp.shp shp/ne_50m_admin_0_countries_lakes.shp
+all: shp/tl_2013_us_county_clipped.shp shp/tl_2013_us_cbsa_clipped.shp shp/tl_2013_us_county.shp shp/tl_2013_us_cbsa.shp shp/region-shp.shp shp/ne_10m_admin_1_states_provinces_lakes_shp.shp shp/ne_10m_admin_0_countries_lakes.shp shp/ne_50m_admin_1_states_provinces_lakes_shp.shp shp/ne_50m_admin_0_countries_lakes.shp
 
 clean:
 	rm -rf shp
