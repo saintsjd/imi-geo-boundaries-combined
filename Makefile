@@ -13,7 +13,7 @@ clobber: clean
 
 output/imi_overview_map.topojson: tmp/imi_overview_map.shp
 	mkdir -p $(dir $@)
-	topojson -q 1e5 -s 7e-7 -p --id-property=id -o $@ -- $<
+	topojson -q 1e5 -s 7e-7 --id-property=id -o $@ -- $<
 	touch $@
 
 tmp/imi_overview_map.shp: tmp/counties_us.shp tmp/states_ca_mx.shp
