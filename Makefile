@@ -28,9 +28,23 @@ tmp/counties_us.shp: tmp/tl_2013_us_county_clipped.shp tmp/states_us.shp
 tmp/states_ca_mx.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
 	ogr2ogr -sql "select code_hasc as id, iso_a2 as country,region_big as region,name as state,postal as state_abbr, SUBSTR(code_local,3,2) as statefp FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('CA', 'MX')" $@ $<
 	touch $@
-tmp/states_us.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
-	ogr2ogr -sql "select iso_a2 as country,region_big as region,name as state,postal as state_abbr, SUBSTR(code_local,3,2) as statefp,code_hasc as id FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('US')" $@ $<
+
+## TEMP FIX because natural earth data has incorrect fips code for minnesota
+#tmp/states_us.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
+tmp/states_us.shp: tmp/states_us_minnesota.shp tmp/states_us_tmp.shp
+	#ogr2ogr -sql "select iso_a2 as country,region_big as region,name as state,postal as state_abbr, SUBSTR(code_local,3,2) as statefp,code_hasc as id FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('US')" $@ $<
+	ogr2ogr $@ tmp/states_us_tmp.shp
+	ogr2ogr -update -append $@ tmp/states_us_minnesota.shp -nln states_us
 	touch $@
+tmp/states_us_minnesota.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
+	ogr2ogr -sql "select iso_a2 as country,region_big as region,name as state,postal as state_abbr, '27' as statefp,code_hasc as id FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('US') and postal='MN'" $@ $<
+	touch $@
+tmp/states_us_tmp.shp: shp/ne_10m_admin_1_states_provinces_lakes_shp.shp
+	ogr2ogr -sql "select iso_a2 as country,region_big as region,name as state,postal as state_abbr, SUBSTR(code_local,3,2) as statefp,code_hasc as id FROM ne_10m_admin_1_states_provinces_lakes_shp where iso_a2 IN ('US') and postal !='MN'" $@ $<
+	touch $@
+
+
+
 
 tmp/tl_2013_us_county_clipped.shp: shp/ne_10m_admin_0_countries_lakes.shp shp/tl_2013_us_county.shp
 	mkdir -p $(dir $@)
