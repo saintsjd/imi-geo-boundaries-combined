@@ -3,12 +3,11 @@ all: output/imi_overview_map.topojson
 
 clean:
 	rm -rf shp
-	rm -rf geojson
-	rm -rf topojson
+	rm -rf output
+	rm -rf tmp
 
 clobber: clean
 	rm -rf zip
-	rm -rf gz
 
 
 output/imi_overview_map.topojson: tmp/imi_overview_map.shp
