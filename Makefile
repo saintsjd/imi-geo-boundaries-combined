@@ -1,6 +1,5 @@
 
-#all: zip/tl_2013_us_county.zip zip/tl_2013_us_cbsa.zip zip/region-shp.zip zip/ne_10m_admin_1_states_provinces_lakes_shp.zip zip/ne_10m_admin_0_countries_lakes.zip zip/ne_50m_admin_1_states_provinces_lakes_shp.zip zip/ne_50m_admin_0_countries_lakes.zip
-all: tmp/tl_2013_us_county_clipped.shp tmp/tl_2013_us_cbsa_clipped.shp shp/tl_2013_us_county.shp shp/tl_2013_us_cbsa.shp shp/region-shp.shp shp/ne_10m_admin_1_states_provinces_lakes_shp.shp shp/ne_10m_admin_0_countries_lakes.shp shp/ne_50m_admin_1_states_provinces_lakes_shp.shp shp/ne_50m_admin_0_countries_lakes.shp
+all: output/imi_overview_map.topojson
 
 clean:
 	rm -rf shp
@@ -10,6 +9,12 @@ clean:
 clobber: clean
 	rm -rf zip
 	rm -rf gz
+
+
+output/imi_overview_map.topojson: tmp/imi_overview_map.shp
+	mkdir -p $(dir $@)
+	topojson -q 1e5 -s 7e-7 -p --id-property=id -o $@ -- $<
+	touch $@
 
 tmp/imi_overview_map.shp: tmp/counties_us.shp tmp/states_ca_mx.shp
 	mkdir -p $(dir $@)
